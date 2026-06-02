@@ -1,6 +1,6 @@
 # Frontends
 
-The web frontends for the Geekway to the West Rules Lawyer convention system. This repo contains three [React](https://react.dev/) single-page apps, each bundled with [webpack](https://webpack.js.org/). In production they are static bundles served from an S3 bucket behind CloudFront (provisioned by [`ruleslawyer-infra`](https://github.com/geekwaytothewest/ruleslawyer-infra)); locally they build into a Docker/nginx image for the Compose stack. They talk to the [`ruleslawyer-backend`](https://github.com/geekwaytothewest/ruleslawyer-backend) API and authenticate via Auth0.
+The web frontends for the Rules Lawyer convention system. This repo contains three [React](https://react.dev/) single-page apps, each bundled with [webpack](https://webpack.js.org/). In production they are static bundles served from an S3 bucket behind CloudFront (provisioned by [`ruleslawyer-infra`](https://github.com/rules-lawyer/ruleslawyer-infrastructure)); locally they build into a Docker/nginx image for the Compose stack. They talk to the [`ruleslawyer-backend`](https://github.com/rules-lawyer/ruleslawyer-backend) API and authenticate via Auth0.
 
 ## Apps
 
@@ -21,7 +21,7 @@ The web frontends for the Geekway to the West Rules Lawyer convention system. Th
 ## Installation
 
 ```bash
-git clone https://github.com/geekwaytothewest/frontends.git
+git clone https://github.com/rules-lawyer/frontends.git
 ```
 
 For the full stack (backend + database + all frontends) running together, see the [`ruleslawyer-backend`](https://github.com/rules-lawyer/ruleslawyer-backend) README — its Docker Compose setup builds and serves these apps for you.
@@ -78,7 +78,7 @@ In production the `dist/` bundle is uploaded to S3 (see [Deployment](#deployment
 
 ## Deployment
 
-Deployed to AWS S3 + CloudFront via the **Deploy Frontends** GitHub Action (manual `workflow_dispatch`; choose `nonprod` or `prod`), which fans out to all three apps. The static hosting (one private, account-scoped S3 bucket `geekway-{env}-spa-{account}` with three prefixes, fronted by a CloudFront distribution) is provisioned by the CDK in [`ruleslawyer-infra`](https://github.com/rules-lawyer/ruleslawyer-infra) — these apps no longer run as ECS/Fargate tasks. Each job resolves the bucket name from the network stack's `SpaBucketName` output, builds the static bundle, runs `aws s3 sync dist/` into its bucket prefix, then issues a `aws cloudfront create-invalidation` for that prefix:
+Deployed to AWS S3 + CloudFront via the **Deploy Frontends** GitHub Action (manual `workflow_dispatch`; choose `nonprod` or `prod`), which fans out to all three apps. The static hosting (one private, account-scoped S3 bucket `ruleslawyer-{env}-spa-{account}` with three prefixes, fronted by a CloudFront distribution) is provisioned by the CDK in [`ruleslawyer-infra`](https://github.com/rules-lawyer/ruleslawyer-infra) — these apps no longer run as ECS/Fargate tasks. Each job resolves the bucket name from the network stack's `SpaBucketName` output, builds the static bundle, runs `aws s3 sync dist/` into its bucket prefix, then issues a `aws cloudfront create-invalidation` for that prefix:
 
 | App                | S3 prefix          | CloudFront behaviors                 |
 | ------------------ | ------------------ | ------------------------------------ |
