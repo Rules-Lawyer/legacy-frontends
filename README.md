@@ -109,7 +109,7 @@ For this to work, two things outside this repo must be configured:
 1. **CloudFront** must rewrite SPA navigations under a `/legacy/<app>/` prefix to that app's single `index.html` — i.e. any extensionless request under `/legacy/<app>/` (bare, convention-scoped `/legacy/<app>/org/{n}/con/{m}`, or a deep link) returns `/legacy/<app>/index.html` (a CloudFront Function on the viewer-request event). Requests carrying a file extension serve the real asset directly from S3. Because org/con is just part of the path under the prefix, no special convention parsing is needed. See [ruleslawyer-infra/DEPLOYMENT.md](https://github.com/rules-lawyer/ruleslawyer-infra/blob/main/DEPLOYMENT.md).
 2. **Auth0** needs only a **single** allowed callback and logout URL **per app** — they are convention-independent (`AUTH_CALLBACK` / `LOGOUT_RETURN_URL`, e.g. `https://<host>/legacy/admin/callback` and `https://<host>/legacy/admin`), so they do **not** multiply with conventions. The convention the user was on is carried through the login round-trip via Auth0 `appState` and restored with a full-page redirect afterward, so they land back under the right `/legacy/<app>/org/{id}/con/{id}` prefix.
 
-The `API_HOST` secret is the API origin only — e.g. `https://nonprod.library.ruleslawyer.com` (or `http://localhost:8080` locally).
+The `API_HOST` secret is the API origin only — e.g. `https://nonprod.library.ruleslawyer.net` (or `http://localhost:8080` locally).
 
 ## Stay in touch
 
