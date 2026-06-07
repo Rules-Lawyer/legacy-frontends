@@ -6,15 +6,17 @@ The web frontends for the Rules Lawyer convention system. This repo contains thr
 
 | Directory          | Package name                 | Purpose                          | Route              | Docker URL                              |
 | ------------------ | ---------------------------- | -------------------------------- | ------------------ | --------------------------------------- |
-| `board-game-admin` | `board-game-admin`           | Admin interface                  | `/legacy/admin`      | http://localhost:8081/legacy/admin        |
+| `board-game-admin` | `board-game-admin`           | Admin interface **(deprecated)** | `/legacy/admin`      | http://localhost:8081/legacy/admin        |
 | `librarian`        | `library-attendant-interface`| Library attendant interface      | `/legacy/librarian`  | http://localhost:8082/legacy/librarian    |
 | `play-prize-entry` | `play-and-win-prize-entry`   | Play & Win prize entry           | `/legacy/playandwin` | http://localhost:8083/legacy/playandwin   |
 
 (The Ruleslawyer dashboard is a separate Next.js app in the [`ruleslawyer-frontend`](https://github.com/rules-lawyer/ruleslawyer-frontend) repo, not part of this one.)
 
+> **`board-game-admin` is deprecated** in favor of the [`ruleslawyer-frontend`](https://github.com/rules-lawyer/ruleslawyer-frontend) Next.js dashboard, which is at parity with all of its features. It stays here for reference until fully retired — new work should target the dashboard. `librarian` and `play-prize-entry` remain active.
+
 ## Requirements
 
-- Node.js 20+
+- Node.js 24 (pinned via [`.nvmrc`](.nvmrc); CI and the Docker build images both use Node 24)
 - Auth0 tenant (for auth)
 - An accessible `ruleslawyer-backend` API
 
@@ -74,7 +76,7 @@ npm run build:prod
 
 Builds output to `dist/`. Auth0 and API configuration are baked into the bundle at build time from `process.env` (`API_HOST`, `AUTH_DOMAIN`, `AUTH_CLIENT_ID`, `AUTH_CALLBACK`, `API_IDENTIFIER`, `LOGOUT_RETURN_URL`, `WEBPACK_MODE`) via webpack. Note that only the API **origin** (`API_HOST`) is baked — the convention-specific `org/{id}/con/{id}` path is resolved at runtime (see [Multiple conventions](#multiple-conventions)).
 
-In production the `dist/` bundle is uploaded to S3 (see [Deployment](#deployment)). For local use there is also a Docker image (`node:20-slim` build stage compiles the app, then copies `dist/` into an `nginx:stable-alpine` image serving port 80) — this is what the backend's Docker Compose stack builds, passing the same config as build `ARG`s.
+In production the `dist/` bundle is uploaded to S3 (see [Deployment](#deployment)). For local use there is also a Docker image (`node:lts-alpine` build stage compiles the app, then copies `dist/` into an `nginx:stable-alpine` image serving port 80) — this is what the backend's Docker Compose stack builds, passing the same config as build `ARG`s.
 
 ## Deployment
 
@@ -86,7 +88,7 @@ Deployed to AWS S3 + CloudFront via the **Deploy Frontends** GitHub Action (manu
 | `librarian`        | `legacy/librarian`  | `/legacy/librarian`, `/legacy/librarian/*` |
 | `play-prize-entry` | `legacy/playandwin` | `/legacy/playandwin`, `/legacy/playandwin/*` |
 
-CloudFront serves the `/legacy/<app>` prefixes from S3 and forwards `/api/*` to the backend ALB; the apex `/` and everything else go to the **ruleslawyer-frontend** dashboard (also via the ALB). AWS access uses GitHub OIDC (the `ruleslawyer-{env}-github-deploy` role created by the CDK); the bucket name is deterministic but the distribution id is supplied as a secret (`CF_DISTRIBUTION_ID[_NONPROD]`). Auth0 callback/logout URLs and the API URL are baked into each bundle at build time. See the full guide in the infra repo: [ruleslawyer-infra/DEPLOYMENT.md](https://github.com/rules-lawyer/ruleslawyer-infra/blob/main/DEPLOYMENT.md).
+CloudFront serves the `/legacy/<app>` prefixes from S3 and forwards `/api/*` to the backend ALB; the apex `/` and everything else go to the **ruleslawyer-frontend** dashboard (also via the ALB). AWS access uses GitHub OIDC (the `ruleslawyer-{env}-github-deploy` role created by the CDK); the bucket name is deterministic but the distribution id is supplied as a secret (`CF_DISTRIBUTION_ID[_NONPROD]`). Auth0 callback/logout URLs and the API URL are baked into each bundle at build time. See the full guide in the infra repo: [ruleslawyer-infrastructure/DEPLOYMENT.md](https://github.com/rules-lawyer/ruleslawyer-infrastructure/blob/main/DEPLOYMENT.md).
 
 ## Multiple conventions
 
